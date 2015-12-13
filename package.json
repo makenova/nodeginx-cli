@@ -1,0 +1,36 @@
+{
+  "name": "nodeginx-cli",
+  "version": "1.0.0",
+  "description": "An nginx CLI helper.",
+  "main": "index.js",
+  "bin": {
+    "nodeginx": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"LOL! No tests here!\""
+  },
+  "keywords": [
+    "nginx",
+    "reverse-proxy",
+    "proxy",
+    "web-server"
+  ],
+  "author": "makenova",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/makenova/nodeginx-cli"
+  },
+  "bugs": "https://github.com/makenova/nodeginx-cli/issues",
+  "engines": {
+    "node": ">=4.1.1"
+  },
+  "os": [
+    "linux"
+  ],
+  "dependencies": {
+    "chalk": "^1.1.1",
+    "inquirer": "^0.10.1",
+    "@makenova/nodeginx": "*"
+  }
+}
