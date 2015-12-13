@@ -55,7 +55,7 @@ webtask ✘
   exit
 ```
 ## Bugs
-Please report any bugs to: <https://github.com/makenova/nodeginx/issues>
+Please report any bugs to: <https://github.com/makenova/nodeginx-cli/issues>
 
 ## License
 
