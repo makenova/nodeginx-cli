@@ -172,7 +172,8 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
         ];
 
         // prompt user for action and handle user answers
-        inquirer.prompt(questions, function (answers){
+        inquirer.prompt(questions)
+        .then(function (answers) {
           if (answers.askToggleSite) {
             nodeginx.toggleSites(sitesEnabled, answers.askToggleSite, (err, sitestStateObj)=>{
               bail(err);
