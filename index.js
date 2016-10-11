@@ -214,8 +214,8 @@ function gracefulExit(msg) {
 }
 
 function bail(err, msg){
-  if (msg) console.log(msg);
   if (err) {
+    if (msg) console.log(msg);
     console.log(err);
     process.exit(1);
   }
