@@ -1,6 +1,6 @@
 {
   "name": "nodeginx-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "An nginx CLI helper.",
   "main": "index.js",
   "bin": {
@@ -30,6 +30,7 @@
   ],
   "dependencies": {
     "@makenova/nodeginx": "*",
+    "async": "^2.1.1",
     "chalk": "^1.1.1",
     "inquirer": "^1.2.1"
   }

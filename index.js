@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var chalk = require('chalk');
+var async = require('async');
 var inquirer = require('inquirer');
 
 var nodeginx = require('@makenova/nodeginx');
@@ -135,7 +136,7 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
             type: 'input',
             name: 'proxyServerPort',
             message: 'Enter the proxy server port:',
-            default: '6969',
+            default: '8080',
             when: function (answers){
               return answers.proxyServerIp;
             }
@@ -171,11 +172,43 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
           }
         ];
 
+        function xorleft (array0, array1){
+          return array0.filter(array0element=>{
+            return !array1.some(array1element=>{
+              return array1element === array0element;
+            });
+          });
+        }
+
+        function toggleSites (sitesEnabled, askToggleSiteAnswers, callback) {
+          var enabledSites = xorleft(askToggleSiteAnswers, sitesEnabled);
+          var disabledSites = xorleft(sitesEnabled, askToggleSiteAnswers);
+          async.series([
+            // enable sites
+            (callback)=>{ async.eachSeries(enabledSites, nodeginx.enableSite, callback); },
+            // disable sites
+            (callback)=>{ async.eachSeries(disabledSites, nodeginx.disableSite, callback); },
+            // reload nginx configuration
+            (callback)=>{
+              nodeginx.manageNginx('reload', callback);
+            }
+          ], (err)=>{
+            if (err) return callback(err);
+
+            var sitestStateObj = {
+              enabledSites: enabledSites,
+              disabledSites: disabledSites
+            };
+
+            callback(null, sitestStateObj);
+          });
+        }
+
         // prompt user for action and handle user answers
         inquirer.prompt(questions)
         .then(function (answers) {
           if (answers.askToggleSite) {
-            nodeginx.toggleSites(sitesEnabled, answers.askToggleSite, (err, sitestStateObj)=>{
+            toggleSites(sitesEnabled, answers.askToggleSite, (err, sitestStateObj)=>{
               bail(err);
               if(sitestStateObj.enabledSites.length > 0)
                 console.log(`Sites enabled: \n\t${sitestStateObj.enabledSites.join('\n\t')}`);
