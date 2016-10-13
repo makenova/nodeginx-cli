@@ -32,7 +32,7 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
         bail(err);
         let sitesEnabled = files;
 
-        // print list of sites, marked those that are enabled
+        // print list of sites and mark them
         console.log(`${chalk.green('\u2714')} is enabled ${CR}${chalk.red('\u2718')} is disabled ${CR}`);
         let markedSites = sitesAvailable.map(site =>{
           let isEnabled = sitesEnabled.some( enabledSite => {
@@ -183,10 +183,17 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
                 console.log(`Sites disabled: \n\t${sitestStateObj.disabledSites.join('\n\t')}`);
             });
           }else if (answers.askAddSite) {
-            nodeginx.addSite(answers, (err, msg)=>{
-              bail(err);
-              gracefulExit(msg);
-            });
+            if (answers.askAddSite.toLowerCase().indexOf('static') > 0) {
+              nodeginx.addStaticSite(answers, (err, msg)=>{
+                bail(err);
+                gracefulExit(msg);
+              });
+            } else {
+              nodeginx.addProxySite(answers, (err, msg)=>{
+                bail(err);
+                gracefulExit(msg);
+              });
+            }
           }else if (answers.askConfirmRemoveSite) {
             nodeginx.removeSite(answers.askRemoveSite, (err)=>{
               bail(err);
