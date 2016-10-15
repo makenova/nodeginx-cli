@@ -1,13 +1,13 @@
 {
   "name": "nodeginx-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "An nginx CLI helper.",
   "main": "index.js",
   "bin": {
     "nodeginx": "./index.js"
   },
   "scripts": {
-    "test": "echo \"LOL! No tests here!\""
+    "test": "echo \"No tests yet, I'm not sure how to test a cli app. Please help if you can!\""
   },
   "keywords": [
     "nginx",
@@ -29,7 +29,7 @@
     "linux"
   ],
   "dependencies": {
-    "@makenova/nodeginx": "*",
+    "@makenova/nodeginx": "^3.0.1",
     "async": "^2.1.1",
     "chalk": "^1.1.1",
     "inquirer": "^1.2.1"

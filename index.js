@@ -216,7 +216,12 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
                 console.log(`Sites disabled: \n\t${sitestStateObj.disabledSites.join('\n\t')}`);
             });
           }else if (answers.askAddSite) {
-            if (answers.askAddSite.toLowerCase().indexOf('static') > 0) {
+            if (answers.askAddSite === addSitePathStr) {
+              nodeginx.addSiteFromUserFile(answers, (err) => {
+                bail(err)
+                gracefulExit();
+              })
+            } else if (answers.askAddSite === addSiteStaticTplStr) {
               nodeginx.addStaticSite(answers, (err, msg)=>{
                 bail(err);
                 gracefulExit(msg);
