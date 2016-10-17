@@ -248,6 +248,8 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
         });
       });
     });
+  } else {
+    bail(new Error('could not file sites-available or sites-enabled directory'))
   }
 });
 
