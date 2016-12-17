@@ -7,7 +7,7 @@
     "nodeginx": "./index.js"
   },
   "scripts": {
-    "test": "echo \"No tests yet, I'm not sure how to test a cli app. Please help if you can!\""
+    "test": "echo \"No tests yet, I'm not sure how to test an interactive cli app. Please help if you can!\""
   },
   "keywords": [
     "nginx",
