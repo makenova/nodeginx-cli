@@ -1,6 +1,6 @@
 # Nodeginx CLI
 
-A CLI helper for managing [Nginx](https://www.nginx.com) virtual
+A interactive CLI helper for managing [Nginx](https://www.nginx.com) virtual
 host configs and the `nginx` process. This assumes you are using the
 sites-available and sites-enabled setup, where those directories are arranged as
 so,
@@ -10,10 +10,10 @@ so,
 |-- nginx
      |-- nginx.config
      |-- sites-enabled
-     |    |-- site-one
      |    +-- site-two
      +-- sites-available
-          |-- site-two
+          |-- site-one
+          +-- site-two
 ```
 
 server blocks are setup in the sites-available directory and are "turned on"
@@ -26,7 +26,7 @@ This is an [NPM](https://www.npmjs.com) package, [Node.js](https://nodejs.org/en
 is a prerequisite.
 
 ```
-$ npm install --g nodeginx-cli
+$ npm install -g nodeginx-cli
 ```
 
 ## Use
@@ -38,14 +38,9 @@ not set up for pasword-less sudo (not tested).
 
 ```
 makenova@gia:~$ nodeginx
-✔ is enabled
-✘ is disabled
 
-default ✘
-makenova ✔
-votebot ✔
-webtask ✘
-
+site-one (disabled)
+site-two (enabled)
 
 ? What would you like to do? (Use arrow keys)
 ❯ enable/disable a site
