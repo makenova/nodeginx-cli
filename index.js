@@ -34,16 +34,15 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
         let sitesEnabled = files;
 
         // print list of sites and mark them
-        console.log(`${chalk.green('\u2714')} is enabled ${CR}${chalk.red('\u2718')} is disabled ${CR}`);
-        let markedSites = sitesAvailable.map(site =>{
+        let markedSites = sitesAvailable.map(site => {
           let isEnabled = sitesEnabled.some( enabledSite => {
             return site === enabledSite;
           });
-          if(isEnabled){
-            console.log(site + chalk.green(' \u2714'));
+          if(isEnabled) {
+            console.log(site + chalk.green(' (enabled)'));
             return {name: site, checked:isEnabled};
-          }else{
-            console.log(site + chalk.red(' \u2718'));
+          }else {
+            console.log(site + chalk.red(' (disabled)'));
             return {name: site, checked:isEnabled};
           }
         });
