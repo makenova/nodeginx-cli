@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require('fs')
+var path = require('path')
 var chalk = require('chalk')
 var async = require('async')
 var inquirer = require('inquirer')
@@ -19,6 +20,27 @@ const removeSiteStr = 'remove a site'
 const manageNginxStr = 'start/stop/restart nginx'
 const exitProgramStr = 'exit'
 
+// Utility
+function gracefulExit (msg) {
+  if (msg) console.log(msg)
+  console.log('Bye!')
+  process.exit(0)
+}
+
+function bail (err, msg) {
+  if (err) {
+    if (msg) console.log(msg)
+    console.log(err)
+    process.exit(1)
+  }
+}
+
+function resolvePath (sitePath) {
+  sitePath = sitePath.replace(/^~/, process.env.HOME)
+  return path.resolve(sitePath)
+}
+
+// cli function
 fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
   bail(err)
   var sitesFolders = files.some((file) => {
@@ -87,7 +109,8 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
             message: 'Enter path to config file:',
             when: function (answers) {
               return answers.askAddSite === addSitePathStr
-            }
+            },
+            filter: resolvePath
           },
           {
             type: 'input',
@@ -114,7 +137,8 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
             when: function (answers) {
               return Boolean(answers.askAddSite === addSiteStaticTplStr &&
                 answers.tplServerName)
-            }
+            },
+            filter: resolvePath
           },
           {
             type: 'input',
@@ -252,18 +276,3 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
     bail(new Error('could not file sites-available or sites-enabled directory'))
   }
 })
-
-// Utility
-function gracefulExit (msg) {
-  if (msg) console.log(msg)
-  console.log('Bye!')
-  process.exit(0)
-}
-
-function bail (err, msg) {
-  if (err) {
-    if (msg) console.log(msg)
-    console.log(err)
-    process.exit(1)
-  }
-}
