@@ -1,53 +1,53 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
-var chalk = require('chalk');
-var async = require('async');
-var inquirer = require('inquirer');
+var fs = require('fs')
+var chalk = require('chalk')
+var async = require('async')
+var inquirer = require('inquirer')
 
-var nodeginx = require('@makenova/nodeginx');
+var nodeginx = require('@makenova/nodeginx')
 
-const CR = '\n';
+const CR = '\n'
 
 // user actions
-const toggleSiteStr = 'enable/disable a site';
-const addSiteStr = 'add a site';
-const addSitePathStr = 'enter path to config file';
-const addSiteStaticTplStr = 'use static template';
-const addSiteProxyTplStr = 'use proxy template';
-const removeSiteStr = 'remove a site';
-const manageNginxStr = 'start/stop/restart nginx';
-const exitProgramStr = 'exit';
+const toggleSiteStr = 'enable/disable a site'
+const addSiteStr = 'add a site'
+const addSitePathStr = 'enter path to config file'
+const addSiteStaticTplStr = 'use static template'
+const addSiteProxyTplStr = 'use proxy template'
+const removeSiteStr = 'remove a site'
+const manageNginxStr = 'start/stop/restart nginx'
+const exitProgramStr = 'exit'
 
 fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
-  bail(err);
-  var sitesFolders = files.some((file)=>{
-    return file === nodeginx.constants.sitesAvailableStr || file === nodeginx.constants.sitesEnabledStr;
-  });
-  if (sitesFolders){
+  bail(err)
+  var sitesFolders = files.some((file) => {
+    return file === nodeginx.constants.sitesAvailableStr || file === nodeginx.constants.sitesEnabledStr
+  })
+  if (sitesFolders) {
     fs.readdir(nodeginx.constants.NGINX_PATH + nodeginx.constants.sitesAvailableStr, (err, files) => {
-      'use strict';
-      bail(err);
-      let sitesAvailable = files;
+      'use strict'
+      bail(err)
+      let sitesAvailable = files
       fs.readdir(nodeginx.constants.NGINX_PATH + nodeginx.constants.sitesEnabledStr, (err, files) => {
-        bail(err);
-        let sitesEnabled = files;
+        bail(err)
+        let sitesEnabled = files
 
         // print list of sites and mark them
         let markedSites = sitesAvailable.map(site => {
-          let isEnabled = sitesEnabled.some( enabledSite => {
-            return site === enabledSite;
-          });
-          if(isEnabled) {
-            console.log(site + chalk.green(' (enabled)'));
-            return {name: site, checked:isEnabled};
-          }else {
-            console.log(site + chalk.red(' (disabled)'));
-            return {name: site, checked:isEnabled};
+          let isEnabled = sitesEnabled.some(enabledSite => {
+            return site === enabledSite
+          })
+          if (isEnabled) {
+            console.log(site + chalk.green(' (enabled)'))
+            return { name: site, checked: isEnabled }
+          } else {
+            console.log(site + chalk.red(' (disabled)'))
+            return { name: site, checked: isEnabled }
           }
-        });
+        })
 
-        console.log(CR);
+        console.log(CR)
 
         // prep questions for user
         var questions = [
@@ -68,8 +68,8 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
             name: 'askToggleSite',
             message: 'Select sites to enable (spacebar to select):',
             choices: markedSites,
-            when: function (answers){
-              return answers.action === toggleSiteStr;
+            when: function (answers) {
+              return answers.action === toggleSiteStr
             }
           },
           {
@@ -77,16 +77,16 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
             name: 'askAddSite',
             message: 'How would you like to add a site?',
             choices: [addSitePathStr, addSiteStaticTplStr, addSiteProxyTplStr],
-            when: function (answers){
-              return answers.action === addSiteStr;
+            when: function (answers) {
+              return answers.action === addSiteStr
             }
           },
           {
             type: 'input',
             name: 'askAddSiteConfig',
             message: 'Enter path to config file:',
-            when: function (answers){
-              return answers.askAddSite === addSitePathStr;
+            when: function (answers) {
+              return answers.askAddSite === addSitePathStr
             }
           },
           {
@@ -94,26 +94,26 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
             name: 'tplPort',
             message: 'What port is Nginx listening on?',
             default: '80',
-            when: function (answers){
+            when: function (answers) {
               return (answers.askAddSite === addSiteStaticTplStr ||
-                answers.askAddSite === addSiteProxyTplStr);
+                answers.askAddSite === addSiteProxyTplStr)
             }
           },
           {
             type: 'input',
             name: 'tplServerName',
             message: 'Enter the site name:',
-            when: function (answers){
-              return Boolean(answers.tplPort);
+            when: function (answers) {
+              return Boolean(answers.tplPort)
             }
           },
           {
             type: 'input',
             name: 'tplSiteRoot',
             message: 'Enter the path to the site root:',
-            when: function (answers){
+            when: function (answers) {
               return Boolean(answers.askAddSite === addSiteStaticTplStr &&
-                answers.tplServerName);
+                answers.tplServerName)
             }
           },
           {
@@ -121,14 +121,13 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
             name: 'proxyServerIp',
             message: 'Enter the proxy server IP address:',
             default: '127.0.0.1',
-            filter: (userport)=>{
-              if (userport.toLowerCase() === 'localhost')
-                userport = '127.0.0.1';
-              return userport;
+            filter: (userport) => {
+              if (userport.toLowerCase() === 'localhost') userport = '127.0.0.1'
+              return userport
             },
-            when: function (answers){
+            when: function (answers) {
               return (answers.askAddSite === addSiteProxyTplStr &&
-                answers.tplServerName);
+                answers.tplServerName)
             }
           },
           {
@@ -136,8 +135,8 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
             name: 'proxyServerPort',
             message: 'Enter the proxy server port:',
             default: '8080',
-            when: function (answers){
-              return answers.proxyServerIp;
+            when: function (answers) {
+              return answers.proxyServerIp
             }
           },
           {
@@ -145,17 +144,17 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
             name: 'askRemoveSite',
             message: 'Select a site to remove',
             choices: sitesAvailable,
-            when: function (answers){
-              return answers.action === removeSiteStr;
+            when: function (answers) {
+              return answers.action === removeSiteStr
             }
           },
           {
             type: 'confirm',
             name: 'askConfirmRemoveSite',
-            message: (answers)=>{return `Are you sure you want to remove ${answers.askRemoveSite}:`;},
+            message: (answers) => { return `Are you sure you want to remove ${answers.askRemoveSite}:` },
             default: false,
-            when: function (answers){
-              return answers.action === removeSiteStr;
+            when: function (answers) {
+              return answers.action === removeSiteStr
             }
           },
           {
@@ -165,104 +164,106 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
             choices: [ 'start', 'stop', 'restart', 'reload', 'force-reload',
               'status', 'configtest', 'rotate', 'upgrade' ],
             default: false,
-            when: function (answers){
-              return answers.action === manageNginxStr;
+            when: function (answers) {
+              return answers.action === manageNginxStr
             }
           }
-        ];
+        ]
 
-        function xorleft (array0, array1){
-          return array0.filter(array0element=>{
-            return !array1.some(array1element=>{
-              return array1element === array0element;
-            });
-          });
+        function xorleft (array0, array1) {
+          return array0.filter(array0element => {
+            return !array1.some(array1element => {
+              return array1element === array0element
+            })
+          })
         }
 
         function toggleSites (sitesEnabled, askToggleSiteAnswers, callback) {
-          var enabledSites = xorleft(askToggleSiteAnswers, sitesEnabled);
-          var disabledSites = xorleft(sitesEnabled, askToggleSiteAnswers);
+          var enabledSites = xorleft(askToggleSiteAnswers, sitesEnabled)
+          var disabledSites = xorleft(sitesEnabled, askToggleSiteAnswers)
           async.series([
             // enable sites
-            (callback)=>{ async.eachSeries(enabledSites, nodeginx.enableSite, callback); },
+            (callback) => { async.eachSeries(enabledSites, nodeginx.enableSite, callback) },
             // disable sites
-            (callback)=>{ async.eachSeries(disabledSites, nodeginx.disableSite, callback); },
+            (callback) => { async.eachSeries(disabledSites, nodeginx.disableSite, callback) },
             // reload nginx configuration
-            (callback)=>{
-              nodeginx.manageNginx('reload', callback);
+            (callback) => {
+              nodeginx.manageNginx('reload', callback)
             }
-          ], (err)=>{
-            if (err) return callback(err);
+          ], (err) => {
+            if (err) return callback(err)
 
             var sitestStateObj = {
               enabledSites: enabledSites,
               disabledSites: disabledSites
-            };
+            }
 
-            callback(null, sitestStateObj);
-          });
+            callback(null, sitestStateObj)
+          })
         }
 
         // prompt user for action and handle user answers
         inquirer.prompt(questions)
         .then(function (answers) {
           if (answers.askToggleSite) {
-            toggleSites(sitesEnabled, answers.askToggleSite, (err, sitestStateObj)=>{
-              bail(err);
-              if(sitestStateObj.enabledSites.length > 0)
-                console.log(`Sites enabled: \n\t${sitestStateObj.enabledSites.join('\n\t')}`);
-              if(sitestStateObj.disabledSites.length > 0)
-                console.log(`Sites disabled: \n\t${sitestStateObj.disabledSites.join('\n\t')}`);
-            });
-          }else if (answers.askAddSite) {
+            toggleSites(sitesEnabled, answers.askToggleSite, (err, sitestStateObj) => {
+              bail(err)
+              if (sitestStateObj.enabledSites.length > 0) {
+                console.log(`Sites enabled: \n\t${sitestStateObj.enabledSites.join('\n\t')}`)
+              }
+              if (sitestStateObj.disabledSites.length > 0) {
+                console.log(`Sites disabled: \n\t${sitestStateObj.disabledSites.join('\n\t')}`)
+              }
+            })
+          } else if (answers.askAddSite) {
             if (answers.askAddSite === addSitePathStr) {
               nodeginx.addSiteFromUserFile(answers, (err) => {
                 bail(err)
-                gracefulExit();
+                gracefulExit()
               })
             } else if (answers.askAddSite === addSiteStaticTplStr) {
-              nodeginx.addStaticSite(answers, (err, msg)=>{
-                bail(err);
-                gracefulExit(msg);
-              });
+              nodeginx.addStaticSite(answers, (err, msg) => {
+                bail(err)
+                gracefulExit(msg)
+              })
             } else {
-              nodeginx.addProxySite(answers, (err, msg)=>{
-                bail(err);
-                gracefulExit(msg);
-              });
+              nodeginx.addProxySite(answers, (err, msg) => {
+                bail(err)
+                gracefulExit(msg)
+              })
             }
-          }else if (answers.askConfirmRemoveSite) {
-            nodeginx.removeSite(answers.askRemoveSite, (err)=>{
-              bail(err);
-              gracefulExit(`${answers.askRemoveSite} removed`);
-            });
-          }else if (answers.askManageNginx) {
-            nodeginx.manageNginx(answers.askManageNginx, (err)=>{
-              bail(err, `failed to ${answers.askManageNginx} nginx`);
-              gracefulExit(`${answers.askManageNginx}ed nginx`);
-            });
-          }else {
-            gracefulExit();
+          } else if (answers.askConfirmRemoveSite) {
+            nodeginx.removeSite(answers.askRemoveSite, (err) => {
+              bail(err)
+              gracefulExit(`${answers.askRemoveSite} removed`)
+            })
+          } else if (answers.askManageNginx) {
+            nodeginx.manageNginx(answers.askManageNginx, (err) => {
+              bail(err, `failed to ${answers.askManageNginx} nginx`)
+              gracefulExit(`${answers.askManageNginx}ed nginx`)
+            })
+          } else {
+            gracefulExit()
           }
-        });
-      });
-    });
+        })
+      })
+    })
   } else {
     bail(new Error('could not file sites-available or sites-enabled directory'))
   }
-});
+})
 
 // Utility
-function gracefulExit(msg) {
-  if (msg) console.log(msg);
-  console.log('Bye!');
-  process.exit(0);
+function gracefulExit (msg) {
+  if (msg) console.log(msg)
+  console.log('Bye!')
+  process.exit(0)
 }
 
-function bail(err, msg){
+function bail (err, msg) {
   if (err) {
-    if (msg) console.log(msg);
-    console.log(err);
-    process.exit(1);
+    if (msg) console.log(msg)
+    console.log(err)
+    process.exit(1)
   }
 }
