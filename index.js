@@ -241,17 +241,32 @@ fs.readdir(nodeginx.constants.NGINX_PATH, (err, files) => {
             })
           } else if (answers.askAddSite) {
             if (answers.askAddSite === addSitePathStr) {
-              nodeginx.addSiteFromUserFile(answers, (err) => {
+              const options = { path: answers.askAddSiteConfig }
+
+              nodeginx.addSiteFromUserFile(options, (err) => {
                 bail(err)
                 gracefulExit()
               })
             } else if (answers.askAddSite === addSiteStaticTplStr) {
-              nodeginx.addStaticSite(answers, (err, msg) => {
+              const options = {
+                port: answers.tplPort,
+                serverName: answers.tplServerName,
+                siteRoot: answers.tplSiteRoot
+              }
+
+              nodeginx.addStaticSite(options, (err, msg) => {
                 bail(err)
                 gracefulExit(msg)
               })
             } else {
-              nodeginx.addProxySite(answers, (err, msg) => {
+              const options = {
+                port: answers.tplPort,
+                serverName: answers.tplServerName,
+                proxyServerIp: answers.proxyServerIp,
+                proxyServerPort: answers.proxyServerPort
+              }
+
+              nodeginx.addProxySite(options, (err, msg) => {
                 bail(err)
                 gracefulExit(msg)
               })
